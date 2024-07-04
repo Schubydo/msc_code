@@ -7,7 +7,7 @@ import pandas as pd
 def ci(y, N_TRIALS):
     return 1.96 * y.std(axis=0) / np.sqrt(N_TRIALS)
 
-def ci_bo(dim, acqf_type, batch_size=10, epochs=10, n_init=100, N_TRIALS=10, function=Ackley, lower_bound=-32.176, upper_bound=32.176):
+def ci_bo(dim, acqf_type, batch_size=10, epochs=10, n_init=100, N_TRIALS=10, function=Ackley, lower_bound=-32.176, upper_bound=32.176, super_seed):
 
     fx_all = []
     for i in range(N_TRIALS):
@@ -18,7 +18,7 @@ def ci_bo(dim, acqf_type, batch_size=10, epochs=10, n_init=100, N_TRIALS=10, fun
                                          n_init=n_init, 
                                          lower_bound=lower_bound,
                                          upper_bound=upper_bound,
-                                         seed=i,
+                                         seed=i*super_seed,
                                          acqf_type=acqf_type)
         
         optimizer.run()
@@ -50,10 +50,10 @@ def compare_acquisition_functions(ucb, ucb_ci, ei, ei_ci, pi, pi_ci, filename='a
         (('UCB', final_ucb, final_ucb_ci), ('PI', final_pi, final_pi_ci)),
         (('EI', final_ei, final_ei_ci), ('PI', final_pi, final_pi_ci)),
     ]:
-        best_acq = acq1[0] if final1 > final2 else acq2[0]
+        best_acq = acq1 if final1 > final2 else acq2
         superior = 'Yes' if final1 - ci1 > final2 + ci2 else 'No'
         results.append({
-            'Comparison': f'{acq1[0]} vs {acq2[0]}',
+            'Comparison': f'{acq1} vs {acq2}',
             'Best': best_acq,
             'Superior': superior
         })
@@ -65,3 +65,29 @@ def compare_acquisition_functions(ucb, ucb_ci, ei, ei_ci, pi, pi_ci, filename='a
     results_df.to_csv(filename, index=False)
 
     print(results_df)
+
+def plot_acquisition_functions(ucb_2, ucb_ci_2, ei_2, ei_ci_2, pi_2, pi_ci_2):
+    plt.figure(figsize=(10, 6))
+
+    # Plot qUCB
+    plt.plot(ucb_2, label='qUCB')
+    plt.fill_between(np.arange(len(ucb_2)), ucb_2 - ucb_ci_2, ucb_2 + ucb_ci_2, alpha=0.2, label='95% CI (qUCB)')
+
+    # Plot qEI
+    plt.plot(ei_2, label='qEI')
+    plt.fill_between(np.arange(len(ei_2)), ei_2 - ei_ci_2, ei_2 + ei_ci_2, alpha=0.2, label='95% CI (qEI)')
+
+    # Plot qPI
+    plt.plot(pi_2, label='qPI')
+    plt.fill_between(np.arange(len(pi_2)), pi_2 - pi_ci_2, pi_2 + pi_ci_2, alpha=0.2, label='95% CI (qPI)')
+
+    # Plot Optimum
+    plt.plot([0, len(ucb_2)], [0, 0], "k--", lw=3, label='Optimum')
+
+    plt.ylim([-20, 1])
+    plt.title('Acquisition functions on 2D Ackley')
+    plt.xlabel('Iteration')
+    plt.ylabel('Max y value')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
