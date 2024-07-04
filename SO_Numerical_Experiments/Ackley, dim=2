@@ -1,0 +1,4 @@
+Comparison,Best,Superior
+UCB vs EI,UCB,Yes
+UCB vs PI,UCB,Yes
+EI vs PI,PI,No

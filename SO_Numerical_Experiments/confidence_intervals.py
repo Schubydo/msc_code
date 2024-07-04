@@ -7,7 +7,7 @@ import pandas as pd
 def ci(y, N_TRIALS):
     return 1.96 * y.std(axis=0) / np.sqrt(N_TRIALS)
 
-def ci_bo(dim, acqf_type, batch_size=10, epochs=10, n_init=100, N_TRIALS=10, function=Ackley, lower_bound=-32.176, upper_bound=32.176, super_seed):
+def ci_bo(dim, acqf_type, batch_size=10, epochs=10, n_init=100, N_TRIALS=10, function=Ackley, lower_bound=-32.176, upper_bound=32.176, super_seed=1):
 
     fx_all = []
     for i in range(N_TRIALS):
@@ -18,7 +18,7 @@ def ci_bo(dim, acqf_type, batch_size=10, epochs=10, n_init=100, N_TRIALS=10, fun
                                          n_init=n_init, 
                                          lower_bound=lower_bound,
                                          upper_bound=upper_bound,
-                                         seed=i*super_seed,
+                                         seed=i+super_seed,
                                          acqf_type=acqf_type)
         
         optimizer.run()
@@ -67,6 +67,7 @@ def compare_acquisition_functions(ucb, ucb_ci, ei, ei_ci, pi, pi_ci, filename='a
     print(results_df)
 
 def plot_acquisition_functions(ucb_2, ucb_ci_2, ei_2, ei_ci_2, pi_2, pi_ci_2):
+
     plt.figure(figsize=(10, 6))
 
     # Plot qUCB
