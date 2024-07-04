@@ -16,7 +16,7 @@ from botorch.acquisition import qExpectedImprovement, qUpperConfidenceBound, qPr
 class BayesianOptimization:
     def __init__(self, fun, dim=5, batch_size=10, n_init=None, 
                 epochs=10, num_restarts=10, raw_samples=512, seed=0, 
-                bound=32.768, acqf_type='qEI'):
+                lower_bound=-32.768, upper_bound=32.768, acqf_type='qEI'):
         
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.dtype = torch.double
@@ -27,12 +27,13 @@ class BayesianOptimization:
         self.num_restarts = num_restarts
         self.raw_samples = raw_samples
         self.seed = seed
-        self.bound = bound
+        self.lower_bound = lower_bound
+        self.upper_bound = upper_bound
         self.acqf_type = acqf_type
         
         self.fun = fun
-        self.fun.bounds[0, :].fill_(-self.bound) # Bounds of the function
-        self.fun.bounds[1, :].fill_(self.bound)
+        self.fun.bounds[0, :].fill_(self.lower_bound) # Bounds of the function
+        self.fun.bounds[1, :].fill_(self.upper_bound)
         self.lb, self.ub = self.fun.bounds
 
         self.X_ei = self.get_initial_points(self.dim, self.n_init)
@@ -81,7 +82,7 @@ class BayesianOptimization:
         for _ in range(self.epochs):
 
             train_Y = (self.Y_ei - self.Y_ei.mean()) / self.Y_ei.std()
-            likelihood = GaussianLikelihood(noise_constraint=Interval(1e-8, 1e-6))  # Noise constraints (1e-8, 1e-3)
+            likelihood = GaussianLikelihood(noise_constraint=Interval(1e-8, 1e-3))  # Noise constraints (1e-8, 1e-3)
             model = SingleTaskGP(self.X_ei, train_Y, likelihood=likelihood)
             mll = ExactMarginalLogLikelihood(model.likelihood, model)
             fit_gpytorch_mll(mll)
@@ -111,7 +112,7 @@ class BayesianOptimization:
             self.X_ei = torch.cat((self.X_ei, candidate), axis=0)
             self.Y_ei = torch.cat((self.Y_ei, Y_next), axis=0)
 
-            # Print current status
+            # Print current best value
             print(f"{len(self.X_ei)}) Best value: {self.Y_ei.max().item():.2e}")
 
         best_idx = self.Y_ei.argmax().item()
@@ -126,7 +127,7 @@ if __name__ == "__main__":
     # Ackley(dim=dim, negate=True).to(dtype=self.dtype, device=self.device)
     # qEI, qUCB, qPI
     optimizer = BayesianOptimization(fun=Ackley(dim=2, negate=True),batch_size=10, 
-                                     dim=2, epochs=10, n_init=10, bound=32.768, acqf_type='qEI')
+                                     dim=2, epochs=10, n_init=10, lower_bound=-32.768,upper_bound=32.768, acqf_type='qEI')
     x_max, y_max = optimizer.run()
     data = optimizer.get_data()
     print(data)
