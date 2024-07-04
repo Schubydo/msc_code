@@ -113,7 +113,7 @@ class BayesianOptimization:
             self.Y_ei = torch.cat((self.Y_ei, Y_next), axis=0)
 
             # Print current best value
-            print(f"{len(self.X_ei)}) Best value: {self.Y_ei.max().item():.2e}")
+            # print(f"{len(self.X_ei)}) Best value: {self.Y_ei.max().item():.2e}")
 
         best_idx = self.Y_ei.argmax().item()
         best_x = unnormalize(self.X_ei[best_idx], self.fun.bounds)
