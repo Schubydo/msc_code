@@ -7,11 +7,11 @@ import pandas as pd
 def ci(y, N_TRIALS):
     return 1.96 * y.std(axis=0) / np.sqrt(N_TRIALS)
 
-def ci_bo(dim, acqf_type, batch_size=10, epochs=10, n_init=100, N_TRIALS=10, function=Ackley, lower_bound=-32.176, upper_bound=32.176, super_seed=1):
+def ci_bo(dim, acqf_type, batch_size=10, epochs=10, n_init=100, N_TRIALS=10, function, lower_bound=-32.176, upper_bound=32.176, super_seed=1):
 
     fx_all = []
     for i in range(N_TRIALS):
-        optimizer = BayesianOptimization(fun=function(dim=dim, negate=True), 
+        optimizer = BayesianOptimization(fun=function, 
                                          batch_size=batch_size, 
                                          dim=dim, 
                                          epochs=epochs, 
