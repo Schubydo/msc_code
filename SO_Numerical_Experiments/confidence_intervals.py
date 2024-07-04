@@ -73,7 +73,7 @@ def compare_acquisition_functions(ucb, ucb_ci, ei, ei_ci, pi, pi_ci, filename='a
 
     print(results_df)
 
-def plot_acquisition_functions(ucb_2, ucb_ci_2, ei_2, ei_ci_2, pi_2, pi_ci_2):
+def plot_acquisition_functions(ucb_2, ucb_ci_2, ei_2, ei_ci_2, pi_2, pi_ci_2, title='Acquisition functions on 2D Ackley'):
 
     plt.figure(figsize=(10, 6))
 
@@ -93,7 +93,7 @@ def plot_acquisition_functions(ucb_2, ucb_ci_2, ei_2, ei_ci_2, pi_2, pi_ci_2):
     plt.plot([0, len(ucb_2)], [0, 0], "k--", lw=3, label='Optimum')
 
     plt.ylim([-20, 1])
-    plt.title('Acquisition functions on 2D Ackley')
+    plt.title(title)
     plt.xlabel('Iteration')
     plt.ylabel('Max y value')
     plt.legend()
