@@ -1,0 +1,7 @@
+Comparison,Is_Greater,Superior
+UCB > EI,1,1
+UCB > PI,1,1
+EI > UCB,0,0
+EI > PI,1,1
+PI > UCB,0,0
+PI > EI,0,0
