@@ -34,7 +34,7 @@ class BayesianOptimization:
         }
         self.SMOKE_TEST = os.environ.get("SMOKE_TEST")
         self.problem = BraninCurrin(negate=True).to(**self.tkwargs)
-        self.NOISE_SE = torch.tensor([15.19, 0.63], **self.tkwargs)
+        self.NOISE_SE = torch.tensor([0, 0], **self.tkwargs) # [15.19, 0.63]
         self.BATCH_SIZE = BATCH_SIZE
         self.NUM_RESTARTS = 10 if not self.SMOKE_TEST else 2
         self.RAW_SAMPLES = 512 if not self.SMOKE_TEST else 4
@@ -150,7 +150,7 @@ class BayesianOptimization:
         return new_x, new_obj, new_obj_true
 
     def run_optimization(self):
-        train_x_qparego, train_obj_qparego, train_obj_true_qparego = self.generate_initial_data(n=2 * (self.problem.dim + 1))
+        train_x_qparego, train_obj_qparego, train_obj_true_qparego = self.generate_initial_data()
         mll_qparego, model_qparego = self.initialize_model(train_x_qparego, train_obj_qparego)
         
         train_x_qehvi, train_obj_qehvi, train_obj_true_qehvi = train_x_qparego, train_obj_qparego, train_obj_true_qparego
@@ -187,7 +187,7 @@ class BayesianOptimization:
             new_x_qnehvi, new_obj_qnehvi, new_obj_true_qnehvi = self.optimize_qnehvi_and_get_observation(
                 model_qnehvi, train_x_qnehvi, train_obj_qnehvi, qnehvi_sampler
             )
-            new_x_random, new_obj_random, new_obj_true_random = self.generate_initial_data(n=self.BATCH_SIZE)
+            new_x_random, new_obj_random, new_obj_true_random = self.generate_initial_data()
 
             train_x_qparego = torch.cat([train_x_qparego, new_x_qparego])
             train_obj_qparego = torch.cat([train_obj_qparego, new_obj_qparego])
