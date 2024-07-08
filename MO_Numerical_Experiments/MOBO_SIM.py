@@ -27,13 +27,13 @@ from botorch.optim.optimize import optimize_acqf, optimize_acqf_list
 
 
 class BayesianOptimization:
-    def __init__(self, BATCH_SIZE = 4, N_BATCH = 20, INITIAL_SAMPLES=6):
+    def __init__(self, BATCH_SIZE = 4, N_BATCH = 20, INITIAL_SAMPLES=6, problem=BraninCurrin(negate=True)):
         self.tkwargs = {
             "dtype": torch.double,
             "device": torch.device("cuda" if torch.cuda.is_available() else "cpu"),
         }
         self.SMOKE_TEST = os.environ.get("SMOKE_TEST")
-        self.problem = BraninCurrin(negate=True).to(**self.tkwargs)
+        self.problem = problem.to(**self.tkwargs)
         self.NOISE_SE = torch.tensor([15.19, 0.63], **self.tkwargs) # [15.19, 0.63]
         self.BATCH_SIZE = BATCH_SIZE
         self.NUM_RESTARTS = 10 if not self.SMOKE_TEST else 2
@@ -233,7 +233,7 @@ class BayesianOptimization:
 
 if __name__ == "__main__":
     # Instantiate the Bayesian Optimization class
-    bo = BayesianOptimization(BATCH_SIZE= 4,N_BATCH= 10,INITIAL_SAMPLES= 6)
+    bo = BayesianOptimization(BATCH_SIZE= 4,N_BATCH= 10,INITIAL_SAMPLES= 6, probelm=BraninCurrin(negate=True))
 
     # Run the optimization process
     random, qparego, qehvi, qnehvi = bo.run_optimization()
