@@ -34,7 +34,7 @@ class BayesianOptimization:
         }
         self.SMOKE_TEST = os.environ.get("SMOKE_TEST")
         self.problem = problem.to(**self.tkwargs)
-        self.NOISE_SE = torch.tensor([15.19, 0.63], **self.tkwargs) # [15.19, 0.63]
+        self.NOISE_SE = torch.tensor([0, 0], **self.tkwargs) # [15.19, 0.63]
         self.BATCH_SIZE = BATCH_SIZE
         self.NUM_RESTARTS = 10 if not self.SMOKE_TEST else 2
         self.RAW_SAMPLES = 512 if not self.SMOKE_TEST else 4
