@@ -148,7 +148,13 @@ class BayesianOptimization:
         new_obj_true = self.problem(new_x)
         new_obj = new_obj_true + torch.randn_like(new_obj_true) * self.NOISE_SE
         return new_x, new_obj, new_obj_true
-
+    
+    def return_train_obj_true(self):
+        return (self.train_obj_true_random, 
+                self.train_obj_true_qparego, 
+                self.train_obj_true_qehvi, 
+                self.train_obj_true_qnehvi)
+    
     def run_optimization(self):
         train_x_qparego, train_obj_qparego, train_obj_true_qparego = self.generate_initial_data()
         mll_qparego, model_qparego = self.initialize_model(train_x_qparego, train_obj_qparego)
@@ -237,3 +243,7 @@ if __name__ == "__main__":
 
     # Run the optimization process
     random, qparego, qehvi, qnehvi = bo.run_optimization()
+    
+    # Get the training data
+    train_data = bo.return_train_obj_true()
+    print(train_data)
