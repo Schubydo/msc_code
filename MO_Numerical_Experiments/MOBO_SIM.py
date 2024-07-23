@@ -156,17 +156,17 @@ class BayesianOptimization:
                 self.train_obj_true_qnehvi)
     
     def run_optimization(self):
-        train_x_qparego, train_obj_qparego, train_obj_true_qparego = self.generate_initial_data()
+        train_x_qparego, train_obj_qparego, self.train_obj_true_qparego = self.generate_initial_data()
         mll_qparego, model_qparego = self.initialize_model(train_x_qparego, train_obj_qparego)
         
-        train_x_qehvi, train_obj_qehvi, train_obj_true_qehvi = train_x_qparego, train_obj_qparego, train_obj_true_qparego
-        train_x_qnehvi, train_obj_qnehvi, train_obj_true_qnehvi = train_x_qparego, train_obj_qparego, train_obj_true_qparego
-        train_x_random, train_obj_random, train_obj_true_random = train_x_qparego, train_obj_qparego, train_obj_true_qparego
+        train_x_qehvi, train_obj_qehvi, self.train_obj_true_qehvi = train_x_qparego, train_obj_qparego, self.train_obj_true_qparego
+        train_x_qnehvi, train_obj_qnehvi, self.train_obj_true_qnehvi = train_x_qparego, train_obj_qparego, self.train_obj_true_qparego
+        train_x_random, train_obj_random, self.train_obj_true_random = train_x_qparego, train_obj_qparego, self.train_obj_true_qparego
         
         mll_qehvi, model_qehvi = self.initialize_model(train_x_qehvi, train_obj_qehvi)
         mll_qnehvi, model_qnehvi = self.initialize_model(train_x_qnehvi, train_obj_qnehvi)
 
-        bd = DominatedPartitioning(ref_point=self.problem.ref_point, Y=train_obj_true_qparego)
+        bd = DominatedPartitioning(ref_point=self.problem.ref_point, Y=self.train_obj_true_qparego)
         volume = bd.compute_hypervolume().item()
         self.hvs_qparego.append(volume)
         self.hvs_qehvi.append(volume)
@@ -197,23 +197,23 @@ class BayesianOptimization:
 
             train_x_qparego = torch.cat([train_x_qparego, new_x_qparego])
             train_obj_qparego = torch.cat([train_obj_qparego, new_obj_qparego])
-            train_obj_true_qparego = torch.cat([train_obj_true_qparego, new_obj_true_qparego])
+            self.train_obj_true_qparego = torch.cat([self.train_obj_true_qparego, new_obj_true_qparego])
 
             train_x_qehvi = torch.cat([train_x_qehvi, new_x_qehvi])
             train_obj_qehvi = torch.cat([train_obj_qehvi, new_obj_qehvi])
-            train_obj_true_qehvi = torch.cat([train_obj_true_qehvi, new_obj_true_qehvi])
+            self.train_obj_true_qehvi = torch.cat([self.train_obj_true_qehvi, new_obj_true_qehvi])
 
             train_x_qnehvi = torch.cat([train_x_qnehvi, new_x_qnehvi])
             train_obj_qnehvi = torch.cat([train_obj_qnehvi, new_obj_qnehvi])
-            train_obj_true_qnehvi = torch.cat([train_obj_true_qnehvi, new_obj_true_qnehvi])
+            self.train_obj_true_qnehvi = torch.cat([self.train_obj_true_qnehvi, new_obj_true_qnehvi])
 
             train_x_random = torch.cat([train_x_random, new_x_random])
             train_obj_random = torch.cat([train_obj_random, new_obj_random])
-            train_obj_true_random = torch.cat([train_obj_true_random, new_obj_true_random])
+            self.train_obj_true_random = torch.cat([self.train_obj_true_random, new_obj_true_random])
 
             for hvs_list, train_obj in zip(
                 (self.hvs_random, self.hvs_qparego, self.hvs_qehvi, self.hvs_qnehvi),
-                (train_obj_true_random, train_obj_true_qparego, train_obj_true_qehvi, train_obj_true_qnehvi),
+                (self.train_obj_true_random, self.train_obj_true_qparego, self.train_obj_true_qehvi, self.train_obj_true_qnehvi),
             ):
                 bd = DominatedPartitioning(ref_point=self.problem.ref_point, Y=train_obj)
                 volume = bd.compute_hypervolume().item()
@@ -239,7 +239,7 @@ class BayesianOptimization:
 
 if __name__ == "__main__":
     # Instantiate the Bayesian Optimization class
-    bo = BayesianOptimization(BATCH_SIZE= 4,N_BATCH= 10,INITIAL_SAMPLES= 6, probelm=BraninCurrin(negate=True))
+    bo = BayesianOptimization(BATCH_SIZE= 4,N_BATCH= 1,INITIAL_SAMPLES= 6)
 
     # Run the optimization process
     random, qparego, qehvi, qnehvi = bo.run_optimization()
