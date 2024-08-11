@@ -118,7 +118,7 @@ class BayesianOptimization:
         best_idx = self.Y_ei.argmax().item()
         best_x = unnormalize(self.X_ei[best_idx], self.fun.bounds)
 
-        # Extract length scales
+        # Length scale from the kenel
         lengthscales = model.covar_module.base_kernel.lengthscale.squeeze().cpu().detach().numpy()
 
         print("Lengthscales of the kernel: ", lengthscales)
